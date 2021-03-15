@@ -22,10 +22,10 @@ type sinaStock struct {
 	index  config.IndexType
 }
 
-func newSinaStock(index config.IndexType, number string) sinaStock {
+func newSinaStock(cfg *config.Config) sinaStock {
 	return sinaStock{
-		number: number,
-		index:  index,
+		number: cfg.Number,
+		index:  cfg.Index,
 	}
 }
 
@@ -43,6 +43,14 @@ func (s sinaStock) Get() (*Stock, error) {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
+	}
+	defer resp.Body.Close()
+
+	statusCode := resp.StatusCode
+	if statusCode >= http.StatusInternalServerError {
+		return nil, fmt.Errorf("Sina Server Error, status: %d", statusCode)
+	} else if statusCode >= http.StatusBadRequest {
+		return nil, fmt.Errorf("Honk Client Error, status: %d", statusCode)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)

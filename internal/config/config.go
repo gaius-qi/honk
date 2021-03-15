@@ -43,7 +43,7 @@ func (p *PlatformType) Type() string {
 type IndexType string
 
 const (
-	SinaIndexType IndexType = "sh"
+	ShangHaiIndexType IndexType = "sh"
 )
 
 func (i *IndexType) String() string {
@@ -61,7 +61,7 @@ func (i *IndexType) Type() string {
 
 const (
 	// DefaultIndex is the default stock market index.
-	DefaultIndex = SinaIndexType
+	DefaultIndex = ShangHaiIndexType
 	// DefaultPlatform is the default source platform.
 	DefaultPlatform = SinaPlatformType
 	// DefaultLogLevel is the default logging level.

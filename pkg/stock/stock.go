@@ -7,12 +7,12 @@ import (
 	"github.com/gaius-qi/honk/internal/config"
 )
 
-type StockSupper interface {
+type stockSupper interface {
 	Get() (*Stock, error)
 }
 
 type stockContext struct {
-	strategy StockSupper
+	strategy stockSupper
 }
 
 type Stock struct {
@@ -26,13 +26,13 @@ type Stock struct {
 	Date                 time.Time
 }
 
-func NewStockContext(ctx context.Context, platformType config.PlatformType, cfg *config.Config) StockSupper {
+func NewStockContext(ctx context.Context, platformType config.PlatformType, cfg *config.Config) stockSupper {
 	s := new(stockContext)
 	switch platformType {
 	case config.SinaPlatformType:
-		s.strategy = newSinaStock(cfg.Index, cfg.Number)
+		s.strategy = newSinaStock(cfg)
 	default:
-		s.strategy = newSinaStock(cfg.Index, cfg.Number)
+		s.strategy = newSinaStock(cfg)
 	}
 	return s
 }
