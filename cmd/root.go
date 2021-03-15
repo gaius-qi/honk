@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"context"
-	"fmt"
-	"log"
+	"os"
 
 	"github.com/gaius-qi/honk/internal/config"
+	"github.com/gaius-qi/honk/pkg/stock"
+	"github.com/jedib0t/go-pretty/v6/table"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -22,11 +23,23 @@ var rootCmd = &cobra.Command{
 information and analysis results.
 Complete documentation is available at https://github.com/gaius-qi/honk`,
 	SilenceUsage: true,
+	Args:         cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		fmt.Println(ctx)
+		cfg.Number = args[0]
+		logrus.Debugf("load config success: %#v", cfg)
+
+		s := stock.NewStockContext(ctx, cfg.Platform, cfg)
+		data, err := s.Get()
+		logrus.Debugf("get stock data success: %#v", data)
+		if err != nil {
+			logrus.Errorf("get stock data failed: %#v", err)
+			return err
+		}
+
+		prettyPrint(data)
 		return nil
 	},
 }
@@ -34,7 +47,7 @@ Complete documentation is available at https://github.com/gaius-qi/honk`,
 // Execute is the entry point of the command.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 }
 
@@ -55,12 +68,12 @@ func initConfig() {
 
 	for _, e := range []string{"index", "platform"} {
 		if err := viper.BindEnv(e); err != nil {
-			log.Fatalf(errors.Wrap(err, "cannot bind environment variable").Error())
+			logrus.Fatalf(errors.Wrap(err, "cannot bind environment variable").Error())
 		}
 	}
 
 	if err := viper.Unmarshal(&cfg); err != nil {
-		log.Fatalf(errors.Wrap(err, "cannot unmarshal config").Error())
+		logrus.Fatalf(errors.Wrap(err, "cannot unmarshal config").Error())
 	}
 
 	// config logger
@@ -68,8 +81,8 @@ func initConfig() {
 }
 
 func addFlags(cmd *cobra.Command, cfg *config.Config) {
-	rootCmd.PersistentFlags().StringVarP(&cfg.Platform, "platform", "p", config.DefaultIndex, "set the source platform for stock data")
-	rootCmd.PersistentFlags().StringVarP(&cfg.Index, "index", "i", config.DefaultPlatform, "set the stock market index")
+	rootCmd.PersistentFlags().VarP(&cfg.Platform, "platform", "p", "set the source platform for stock data")
+	rootCmd.PersistentFlags().VarP(&cfg.Index, "index", "i", "set the stock market index")
 }
 
 func logConfig(cfg *config.Config) {
@@ -87,4 +100,20 @@ func logConfig(cfg *config.Config) {
 	if level, err := logrus.ParseLevel(cfg.LogLevel); err == nil {
 		logrus.SetLevel(level)
 	}
+}
+
+func prettyPrint(s *stock.Stock) {
+	timeLayout := "2006-01-02 15:04:05"
+
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.SetStyle(table.StyleColoredBlackOnMagentaWhite)
+
+	t.AppendHeader(table.Row{"Number", "Current Price", "Opening Price", "Previous Closing Price", "High Price", "Low Price", "Date"})
+	t.AppendRows([]table.Row{
+		{s.Number, s.CurrentPrice, s.OpeningPrice, s.PreviousClosingPrice, s.HighPrice, s.LowPrice, s.Date.Format(timeLayout)},
+	})
+	t.AppendSeparator()
+
+	t.Render()
 }
