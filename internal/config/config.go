@@ -1,11 +1,18 @@
 package config
 
+import (
+	"fmt"
+	"reflect"
+)
+
 // Config holds all the runtime config information.
 type Config struct {
+	// Stock number
+	Number string `mapstructure:"number"`
 	// Stock market index
-	Index string `mapstructure:"index"`
+	Index IndexType `mapstructure:"index"`
 	// Source platform for stock data
-	Platform string `mapstructure:"platform"`
+	Platform PlatformType `mapstructure:"platform"`
 	// Verbose toggles the verbosity
 	Debug bool
 	// LogLevel is the level with with to log for this config
@@ -14,11 +21,49 @@ type Config struct {
 	LogFormat string `mapstructure:"log_format"`
 }
 
+type PlatformType string
+
+const (
+	SinaPlatformType PlatformType = "sina"
+)
+
+func (p *PlatformType) String() string {
+	return fmt.Sprint(*p)
+}
+
+func (p *PlatformType) Set(value string) error {
+	*p = PlatformType(value)
+	return nil
+}
+
+func (p *PlatformType) Type() string {
+	return reflect.TypeOf(p).String()
+}
+
+type IndexType string
+
+const (
+	SinaIndexType IndexType = "sh"
+)
+
+func (i *IndexType) String() string {
+	return fmt.Sprint(*i)
+}
+
+func (i *IndexType) Set(value string) error {
+	*i = IndexType(value)
+	return nil
+}
+
+func (i *IndexType) Type() string {
+	return reflect.TypeOf(i).String()
+}
+
 const (
 	// DefaultIndex is the default stock market index.
-	DefaultIndex = "sina"
+	DefaultIndex = SinaIndexType
 	// DefaultPlatform is the default source platform.
-	DefaultPlatform = "sina"
+	DefaultPlatform = SinaPlatformType
 	// DefaultLogLevel is the default logging level.
 	DefaultLogLevel = "warn"
 	// DefaultLogFormat is the default format of the logger
