@@ -4,7 +4,7 @@
 [![Github Build Status](https://github.com/gaius-qi/honk/workflows/Go/badge.svg?branch=main)](https://github.com/gaius-qi/honk/actions?query=workflow%3AGo+branch%3Amain)
 [![GoDoc](https://godoc.org/github.com/gaius-qi/honk?status.svg)](https://godoc.org/github.com/gaius-qi/honk)
 
-Command-line for displaying real-time stock data
+Command-line for displaying real-time stock data.
 
 ## Installation
 
