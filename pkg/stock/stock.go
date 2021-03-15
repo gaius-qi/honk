@@ -26,9 +26,9 @@ type Stock struct {
 	Date                 time.Time
 }
 
-func NewStockContext(ctx context.Context, cfg *config.Config) StockSupper {
+func NewStockContext(ctx context.Context, platformType config.PlatformType, cfg *config.Config) StockSupper {
 	s := new(stockContext)
-	switch cfg.Platform {
+	switch platformType {
 	case config.SinaPlatformType:
 		s.strategy = newSinaStock(cfg.Index, cfg.Number)
 	default:

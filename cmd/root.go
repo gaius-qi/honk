@@ -29,10 +29,13 @@ Complete documentation is available at https://github.com/gaius-qi/honk`,
 		defer cancel()
 
 		cfg.Number = args[0]
+		logrus.Debugf("load config success: %#v", cfg)
 
-		s := stock.NewStockContext(ctx, cfg)
+		s := stock.NewStockContext(ctx, cfg.Platform, cfg)
 		data, err := s.Get()
+		logrus.Debugf("get stock data success: %#v", data)
 		if err != nil {
+			logrus.Errorf("get stock data failed: %#v", err)
 			return err
 		}
 
@@ -104,7 +107,7 @@ func prettyPrint(s *stock.Stock) {
 
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleColoredBright)
+	t.SetStyle(table.StyleColoredBlackOnMagentaWhite)
 
 	t.AppendHeader(table.Row{"Number", "Current Price", "Opening Price", "Previous Closing Price", "High Price", "Low Price", "Date"})
 	t.AppendRows([]table.Row{
