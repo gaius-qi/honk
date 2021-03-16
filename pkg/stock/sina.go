@@ -12,16 +12,23 @@ import (
 )
 
 const (
-	defaultSinaHost     = "hq.sinajs.cn"
+	// defaultSinaHost defines default sina host for stock service
+	defaultSinaHost = "hq.sinajs.cn"
+
+	// defaultSinaProtocol defines default protocol for stock service
 	defaultSinaProtocol = "https:"
-	sinaTimeLayout      = "2006-01-02 15:04:05"
+
+	// sinaTimeLayout defines default time layout
+	sinaTimeLayout = "2006-01-02 15:04:05"
 )
 
+// sinaStock represents the sina stock
 type sinaStock struct {
 	number string
 	index  config.IndexType
 }
 
+// newSinaStock a new client for sina stock client
 func newSinaStock(cfg *config.Config) sinaStock {
 	return sinaStock{
 		number: cfg.Number,
@@ -29,6 +36,7 @@ func newSinaStock(cfg *config.Config) sinaStock {
 	}
 }
 
+// Get will get the stock info from platform's API
 func (s sinaStock) Get() (*Stock, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s//%s", defaultSinaProtocol, defaultSinaHost), nil)
 	if err != nil {

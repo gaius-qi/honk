@@ -5,25 +5,32 @@ import (
 	"reflect"
 )
 
-// Config holds all the runtime config information.
+// Config holds all the runtime config information
 type Config struct {
 	// Stock number
 	Number string `mapstructure:"number"`
+
 	// Stock market index
 	Index IndexType `mapstructure:"index"`
+
 	// Source platform for stock data
 	Platform PlatformType `mapstructure:"platform"`
+
 	// Verbose toggles the verbosity
 	Debug bool
+
 	// LogLevel is the level with with to log for this config
 	LogLevel string `mapstructure:"log_level"`
+
 	// LogFormat is the format that is used for logging
 	LogFormat string `mapstructure:"log_format"`
 }
 
+// PlatformType is the type of
 type PlatformType string
 
 const (
+	// Sina platform
 	SinaPlatformType PlatformType = "sina"
 )
 
@@ -43,6 +50,7 @@ func (p *PlatformType) Type() string {
 type IndexType string
 
 const (
+	// ShangHai Index
 	ShangHaiIndexType IndexType = "sh"
 )
 
@@ -60,15 +68,19 @@ func (i *IndexType) Type() string {
 }
 
 const (
-	// DefaultIndex is the default stock market index.
+	// DefaultIndex is the default stock market index
 	DefaultIndex = ShangHaiIndexType
-	// DefaultPlatform is the default source platform.
+
+	// DefaultPlatform is the default source platform
 	DefaultPlatform = SinaPlatformType
-	// DefaultLogLevel is the default logging level.
+
+	// DefaultLogLevel is the default logging level
 	DefaultLogLevel = "warn"
+
 	// DefaultLogFormat is the default format of the logger
 	DefaultLogFormat = "text"
-	// DefaultDebug is the default debug status.
+
+	// DefaultDebug is the default debug status
 	DefaultDebug = false
 )
 

@@ -44,7 +44,7 @@ Complete documentation is available at https://github.com/gaius-qi/honk`,
 	},
 }
 
-// Execute is the entry point of the command.
+// Execute is the entry point of the command
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		logrus.Fatal(err)
@@ -60,7 +60,7 @@ func init() {
 	addFlags(rootCmd, cfg)
 }
 
-// initConfig reads in config file and ENV variables if set.
+// initConfig reads in config file and ENV variables if set
 func initConfig() {
 	// allow to read in from environment
 	viper.SetEnvPrefix("honk")
