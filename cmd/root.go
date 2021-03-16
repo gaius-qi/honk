@@ -35,7 +35,7 @@ Complete documentation is available at https://github.com/gaius-qi/honk`,
 		data, err := s.Get()
 		logrus.Debugf("get stock data success: %#v", data)
 		if err != nil {
-			logrus.Errorf("get stock data failed: %#v", err)
+			logrus.Errorf("get stock data failed")
 			return err
 		}
 
