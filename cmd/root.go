@@ -14,11 +14,16 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	version = "1.1.0"
+)
+
 var cfg *config.Config
 
 var rootCmd = &cobra.Command{
-	Use:   "honk",
-	Short: "Show stock real-time data tools",
+	Use:     "honk",
+	Version: version,
+	Short:   "Show stock real-time data tools",
 	Long: `A command line tool to display real-time stock 
 information and analysis results.
 Complete documentation is available at https://github.com/gaius-qi/honk`,
@@ -80,8 +85,8 @@ func initConfig() {
 }
 
 func addFlags(cmd *cobra.Command, cfg *config.Config) {
-	rootCmd.PersistentFlags().VarP(&cfg.Platform, "platform", "p", "set the source platform for stock data")
-	rootCmd.PersistentFlags().VarP(&cfg.Index, "index", "i", "set the stock market index")
+	cmd.PersistentFlags().VarP(&cfg.Platform, "platform", "p", "set the source platform for stock data")
+	cmd.PersistentFlags().VarP(&cfg.Index, "index", "i", "set the stock market index")
 }
 
 func logConfig(cfg *config.Config) {
@@ -102,15 +107,22 @@ func logConfig(cfg *config.Config) {
 }
 
 func prettyPrint(s *stock.Stock) {
-	timeLayout := "2006-01-02 15:04:05"
+	timeLayout := "2007-01-02 15:04:05"
 
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleColoredBlackOnMagentaWhite)
 
-	t.AppendHeader(table.Row{"Number", "Current Price", "Opening Price", "Previous Closing Price", "High Price", "Low Price", "Date"})
+	// Set table style
+	if s.PercentageChange[0:1] == "-" {
+		t.SetStyle(table.StyleColoredBlackOnGreenWhite)
+	} else {
+		t.SetStyle(table.StyleColoredBlackOnMagentaWhite)
+	}
+
+	// Set table header
+	t.AppendHeader(table.Row{"Number", "Current Price", "Percentage Change", "Opening Price", "Previous Closing Price", "High Price", "Low Price", "Date"})
 	t.AppendRows([]table.Row{
-		{s.Number, s.CurrentPrice, s.OpeningPrice, s.PreviousClosingPrice, s.HighPrice, s.LowPrice, s.Date.Format(timeLayout)},
+		{s.Number, s.CurrentPrice, s.PercentageChange, s.OpeningPrice, s.PreviousClosingPrice, s.HighPrice, s.LowPrice, s.Date.Format(timeLayout)},
 	})
 	t.AppendSeparator()
 

@@ -21,6 +21,7 @@ type stockContext struct {
 type Stock struct {
 	Name                 string
 	Number               string
+	PercentageChange     string
 	OpeningPrice         string
 	PreviousClosingPrice string
 	CurrentPrice         string

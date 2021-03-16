@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gaius-qi/honk/internal/config"
+	"github.com/gaius-qi/honk/pkg/stock/util"
 )
 
 const (
@@ -78,9 +79,16 @@ func (s sinaStock) Get() (*Stock, error) {
 		return nil, err
 	}
 
+	// Calculate the percent increase/decrease.
+	pc, err := util.PercentageChangeString(data[3], data[4])
+	if err != nil {
+		return nil, err
+	}
+
 	return &Stock{
 		Name:                 data[1],
 		Number:               s.number,
+		PercentageChange:     fmt.Sprintf("%.2f%%", pc),
 		OpeningPrice:         data[2],
 		PreviousClosingPrice: data[3],
 		CurrentPrice:         data[4],
