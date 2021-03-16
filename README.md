@@ -9,7 +9,7 @@ Command-line for displaying real-time stock data.
 ## Installation
 
 ```shell
-$ go install github.com/gaius-qi/honk
+$ go get github.com/gaius-qi/honk
 ```
 
 ## Usage
