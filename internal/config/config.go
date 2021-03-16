@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"reflect"
 )
 
 // Config holds all the runtime config information
@@ -44,7 +43,7 @@ func (p *PlatformType) Set(value string) error {
 }
 
 func (p *PlatformType) Type() string {
-	return reflect.TypeOf(p).String()
+	return "platform"
 }
 
 type IndexType string
@@ -64,7 +63,7 @@ func (i *IndexType) Set(value string) error {
 }
 
 func (i *IndexType) Type() string {
-	return reflect.TypeOf(i).String()
+	return "index"
 }
 
 const (

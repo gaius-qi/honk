@@ -35,7 +35,6 @@ Complete documentation is available at https://github.com/gaius-qi/honk`,
 		data, err := s.Get()
 		logrus.Debugf("get stock data success: %#v", data)
 		if err != nil {
-			logrus.Errorf("get stock data failed")
 			return err
 		}
 
@@ -47,7 +46,7 @@ Complete documentation is available at https://github.com/gaius-qi/honk`,
 // Execute is the entry point of the command
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		logrus.Fatal(err)
+		logrus.Debugf("honk execute error: %#v", err)
 	}
 }
 
