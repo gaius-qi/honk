@@ -2,26 +2,30 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/gaius-qi/honk/internal/config"
 	"github.com/gaius-qi/honk/pkg/stock"
 	"github.com/jedib0t/go-pretty/v6/table"
-
+	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var (
-	version = "1.1.0"
+	name    = "honk"
+	version = "1.2.0"
 )
 
 var cfg *config.Config
+var cfgFile string
 
 var rootCmd = &cobra.Command{
-	Use:     "honk",
+	Use:     name,
 	Version: version,
 	Short:   "Show stock real-time data tools",
 	Long: `A command line tool to display real-time stock 
@@ -33,16 +37,22 @@ Complete documentation is available at https://github.com/gaius-qi/honk`,
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		cfg.Number = args[0]
-		logrus.Debugf("load config success: %#v", cfg)
+		// Init logger
+		initLog(cfg)
 
+		// Parse args
+		cfg.Number = args[0]
+		logrus.Debugf("Load config success: %#v", cfg)
+
+		// Get stock info
 		s := stock.NewStockContext(ctx, cfg.Platform, cfg)
 		data, err := s.Get()
-		logrus.Debugf("get stock data success: %#v", data)
+		logrus.Debugf("Get stock data success: %#v", data)
 		if err != nil {
 			return err
 		}
 
+		// Print data
 		prettyPrint(data)
 		return nil
 	},
@@ -51,56 +61,72 @@ Complete documentation is available at https://github.com/gaius-qi/honk`,
 // Execute is the entry point of the command
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		logrus.Debugf("honk execute error: %#v", err)
+		logrus.Debugf("Execute error: %#v", err)
 	}
 }
 
 func init() {
-	// init config
-	cfg = config.New()
+	// Init default config
+	var err error
+	cfg, err = config.New()
+	if err != nil {
+		panic(err)
+	}
 
-	// initialize cobra
+	// Initialize cobra
 	cobra.OnInitialize(initConfig)
-	addFlags(rootCmd, cfg)
+
+	// Add flags
+	flagSet := rootCmd.PersistentFlags()
+	flagSet.VarP(&cfg.Platform, "platform", "p", "set the source platform for stock data")
+	flagSet.VarP(&cfg.Index, "index", "i", "set the stock market index")
+	flagSet.StringVar(&cfg.LogLevel, "log-level", cfg.LogLevel, "set the level that is used for logging")
+	flagSet.StringVar(&cfg.LogFormat, "log-format", cfg.LogFormat, "set the format that is used for logging")
+	flagSet.StringVar(&cfgFile, "config", "", "config file (default is $HOME/.honk/config.yaml)")
+
+	if err := viper.BindPFlags(rootCmd.PersistentFlags()); err != nil {
+		panic(err)
+	}
 }
 
 // initConfig reads in config file and ENV variables if set
 func initConfig() {
-	// allow to read in from environment
-	viper.SetEnvPrefix("honk")
-	viper.AutomaticEnv()
-
-	for _, e := range []string{"index", "platform"} {
-		if err := viper.BindEnv(e); err != nil {
-			logrus.Fatalf(errors.Wrap(err, "cannot bind environment variable").Error())
+	if cfgFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(cfgFile)
+	} else {
+		// Find home directory.
+		home, err := homedir.Dir()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
 		}
+
+		cfgPath := fmt.Sprintf("%s/.%s", home, name)
+		viper.AddConfigPath(cfgPath)
 	}
 
+	viper.SetEnvPrefix(name)
+	viper.AutomaticEnv() // read in environment variables that match
+
+	// If a config file is found, read it in.
+	if err := viper.ReadInConfig(); err == nil {
+		logrus.Debugf("Using config file: %s", viper.ConfigFileUsed())
+	}
+
+	// Unmarshal config
 	if err := viper.Unmarshal(&cfg); err != nil {
 		logrus.Fatalf(errors.Wrap(err, "cannot unmarshal config").Error())
 	}
-
-	// config logger
-	logConfig(cfg)
 }
 
-func addFlags(cmd *cobra.Command, cfg *config.Config) {
-	cmd.PersistentFlags().VarP(&cfg.Platform, "platform", "p", "set the source platform for stock data")
-	cmd.PersistentFlags().VarP(&cfg.Index, "index", "i", "set the stock market index")
-}
-
-func logConfig(cfg *config.Config) {
-	// reset log format
+func initLog(cfg *config.Config) {
+	// Reset log format
 	if cfg.LogFormat == "json" {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
 	}
 
-	// set debug log level
-	if cfg.Debug {
-		cfg.LogLevel = "debug"
-	}
-
-	// set the configured log level
+	// Set the configured log level
 	if level, err := logrus.ParseLevel(cfg.LogLevel); err == nil {
 		logrus.SetLevel(level)
 	}
