@@ -22,6 +22,7 @@ var (
 )
 
 var cfg *config.Config
+
 var cfgFile string
 
 var rootCmd = &cobra.Command{
