@@ -28,7 +28,7 @@ NUMBER  CURRENT PRICE  PERCENTAGE CHANGE  OPENING PRICE  PREVIOUS CLOSING PRICE 
 - `--log-format=text` set the format that is used for logging, such as `text` or `json`.
 - `--config=config.yaml` config file (default is $HOME/.honk/config.yaml).
 
-## Configuration
+### Configuration
 
 The command will look for the configuration file `config.yaml` in `$HOME/.honk/`, unless overridden by the `--config` option.
 The following settings can be configured:
