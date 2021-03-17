@@ -15,10 +15,7 @@ type Config struct {
 	// Source platform for stock data
 	Platform PlatformType `mapstructure:"platform"`
 
-	// Verbose toggles the verbosity
-	Debug bool
-
-	// LogLevel is the level with with to log for this config
+	// LogLevel is the level with to log for this config
 	LogLevel string `mapstructure:"log_level"`
 
 	// LogFormat is the format that is used for logging
@@ -51,6 +48,9 @@ type IndexType string
 const (
 	// ShangHai Index
 	ShangHaiIndexType IndexType = "sh"
+
+	// ShenZhen Index
+	ShenZhenIndexType IndexType = "sz"
 )
 
 func (i *IndexType) String() string {
@@ -79,17 +79,16 @@ const (
 	// DefaultLogFormat is the default format of the logger
 	DefaultLogFormat = "text"
 
-	// DefaultDebug is the default debug status
-	DefaultDebug = false
+	// DefaultLogFormat is the default format of the logger
+	DefaultConfigExt = "yaml"
 )
 
 // New returns a new Config
-func New() *Config {
+func New() (*Config, error) {
 	return &Config{
 		Index:     DefaultIndex,
 		Platform:  DefaultPlatform,
-		Debug:     DefaultDebug,
 		LogLevel:  DefaultLogLevel,
 		LogFormat: DefaultLogFormat,
-	}
+	}, nil
 }
