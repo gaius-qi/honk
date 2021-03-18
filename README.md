@@ -30,7 +30,7 @@ NUMBER  CURRENT PRICE  PERCENTAGE CHANGE  OPENING PRICE  PREVIOUS CLOSING PRICE 
 
 ### Configuration
 
-The command will look for the configuration file `config.yaml` in `$HOME/.honk/`, unless overridden by the `--config` option.
+The command will look for the configuration file `config.yaml` in `$HOME/.honk`, unless overridden by the `--config` option.
 The following settings can be configured:
 
 ```yaml
